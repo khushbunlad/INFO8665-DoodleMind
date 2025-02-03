@@ -12,7 +12,7 @@
 4. Install packages mentioned in **"requirements.txt"**
     - ```pip install -r requirements.txt```
 5. Select **"venvINFO8665"** environment in your IDE
-6. Create folder named **"Dataset"** in your project directory
+6. Create folder named **"dataset"** in your project directory
 7. Move all files downloaded from Kaggle dataset in the "Dataset" Directory
 
 
