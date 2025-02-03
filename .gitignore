@@ -1,3 +1,9 @@
+# Dataset files
+dataset/*
+
+# Virtual Environment
+venvINFO8665/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
