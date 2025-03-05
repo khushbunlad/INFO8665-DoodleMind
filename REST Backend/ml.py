@@ -13,9 +13,6 @@ categories = ['airplane', 'alarm clock', 'ambulance', 'angel', 'animal migration
 
 model = load_model(os.path.join(os.path.dirname(os.path.abspath(__file__)), "model", "doodlemind_model.h5"))
 
-def top_3_accuracy(y_true, y_pred):
-    return top_k_categorical_accuracy(y_true, y_pred, k=3)
-
 
 def draw_cv2(raw_strokes, size=256, lw=6, time_color=True):
     img = np.zeros((BASE_SIZE, BASE_SIZE), np.uint8)
@@ -42,7 +39,19 @@ def drawing_to_image_array(drawing, size, lw=6, time_color=True):
 def predict_image(drawing_data):
     image = drawing_to_image_array(drawing_data, size)
     preds = model.predict(image)
-    predicted_class = np.argmax(preds, axis=1)[0]
-    confidence = float(np.max(preds))
+    
+    # Get the top 3 highest probabilities
+    top_3_indices = np.argsort(preds[0])[-3:][::-1]  
+    top_3_classes = [categories[int(i)] for i in top_3_indices]  
+    top_3_confidences = [float(preds[0][i]) for i in top_3_indices]  
 
-    return {"prediction": categories[int(predicted_class)], "confidence": confidence}
+    # Get the highest predicted class
+    predicted_class = top_3_classes[0]
+    confidence = top_3_confidences[0]
+
+    return {
+        "prediction": predicted_class,
+        "confidence": confidence,
+        "top_3_classes": top_3_classes,
+        "top_3_confidences": top_3_confidences
+    }
