@@ -18,4 +18,4 @@ ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Run the application
-CMD ["flask", "run"]
+CMD ["python3", "./REST Backend/app.py"]

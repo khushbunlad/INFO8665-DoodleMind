@@ -19,3 +19,10 @@
 ### Update Requirements.txt file once installing new packages
 
 ```pip freeze > requirements.txt```
+
+
+### Build docker image
+```docker build -t doodlemind-flask-app .```
+
+### Run docker image 
+```docker run -p 5004:5004 doodlemind-flask-app```
