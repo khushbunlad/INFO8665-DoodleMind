@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing Canvas</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+        #canvas-container {
+            width: 70%;
+            background-color: #f0f0f0;
+        }
+        #controls {
+            width: 30%;
+            padding: 10px;
+            background-color: #ddd;
+            overflow-y: auto;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="drawCanvas"></canvas>
+    </div>
+    <div id="controls">
+        <h3>Drawn Points:</h3>
+        <ul id="pointsList"></ul>
+    </div>
+    <script>
+        const canvas = document.getElementById("drawCanvas");
+        const ctx = canvas.getContext("2d");
+        const pointsList = document.getElementById("pointsList");
+        let drawing = false;
+        let points = [];
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        canvas.addEventListener("mousedown", (e) => {
+            drawing = true;
+            points = [];
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+            if (!drawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            points.push({ x, y });
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            updatePointsList(x, y);
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            drawing = false;
+            ctx.beginPath();
+        });
+
+        function updatePointsList(x, y) {
+            const li = document.createElement("li");
+            li.textContent = `(${x.toFixed(2)}, ${y.toFixed(2)})`;
+            pointsList.appendChild(li);
+        }
+    </script>
+</body>
+</html>
