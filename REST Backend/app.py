@@ -29,6 +29,9 @@ swagger_template = {
 }
 swagger = Swagger(app, template=swagger_template)
 
+@app.route('/', methods=['GET'])
+def Index():
+    return str("Service is running"),200
 
 @app.route('/predict', methods=['POST'])
 @swag_from({
