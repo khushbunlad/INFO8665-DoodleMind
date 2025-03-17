@@ -3,7 +3,6 @@ import json
 import numpy as np
 import os
 from tensorflow.keras.models import load_model # type: ignore
-from tensorflow.keras.metrics import top_k_categorical_accuracy # type: ignore
 from tensorflow.keras.applications.mobilenet import preprocess_input # type: ignore
 
 size = 64
