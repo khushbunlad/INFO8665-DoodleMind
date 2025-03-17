@@ -51,19 +51,46 @@ export default function DrawingCanvas() {
         ctx.stroke();
     };
 
+    // const stopDrawing = () => {
+    //     setDrawing(false);
+    //     if (currentStroke.length > 0) {
+    //         setStrokes((prev) => [...prev, [currentStroke.map((p) => p.x), currentStroke.map((p) => p.y)]]);
+    //         fetchSuggestedImage([...strokes, [currentStroke.map((p) => p.x), currentStroke.map((p) => p.y)]]);
+    //     }
+    //     setCurrentStroke([]);
+    //     const canvas = canvasRef.current;
+    //     if (!canvas) return;
+    //     const ctx = canvas.getContext('2d');
+    //     if (!ctx) return;
+    //     ctx.beginPath();
+    // };
     const stopDrawing = () => {
         setDrawing(false);
-        if (currentStroke.length > 0) {
-            setStrokes((prev) => [...prev, [currentStroke.map((p) => p.x), currentStroke.map((p) => p.y)]]);
-            fetchSuggestedImage([...strokes, [currentStroke.map((p) => p.x), currentStroke.map((p) => p.y)]]);
+        
+        if (currentStroke.length > 0 && canvasRef.current) {
+            const canvas = canvasRef.current;
+            const { width, height } = canvas;
+    
+            // Scale stroke points to [0, 256] range
+            const scaledStroke = [
+                currentStroke.map((p) => Math.round((p.x / width) * 256)),  // Scaled X values
+                currentStroke.map((p) => Math.round((p.y / height) * 256))  // Scaled Y values
+            ];
+    
+            // Update strokes state
+            setStrokes((prev) => [...prev, scaledStroke]);
+    
+            // Call API with updated strokes
+            fetchSuggestedImage([...strokes, scaledStroke]);
         }
+    
         setCurrentStroke([]);
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        ctx.beginPath();
+    
+        // Reset canvas drawing path
+        const ctx = canvasRef.current?.getContext('2d');
+        if (ctx) ctx.beginPath();
     };
+
 
     const fetchSuggestedImage = async (updatedStrokes: number[][][]) => {
         try {
@@ -83,7 +110,7 @@ export default function DrawingCanvas() {
             setSuggestedPrediction({
                 prediction: data.prediction,
                 confidence: data.confidence,
-                top3: data.top_3_classes.map((cls, index) => ({
+                top3: data.top_3_classes.map((cls:string, index:number) => ({
                     class: cls,
                     confidence: data.top_3_confidences[index],
                 })),
@@ -92,6 +119,27 @@ export default function DrawingCanvas() {
             console.error('Error fetching prediction:', error);
         }
     };
+
+    const scaleStrokes = (strokes: { x: number; y: number }[][], canvasWidth: number, canvasHeight: number) => {
+        return strokes.map(stroke =>
+            [
+                stroke.map(point => Math.round((point.x / canvasWidth) * 256)), // Scale X
+                stroke.map(point => Math.round((point.y / canvasHeight) * 256)) // Scale Y
+            ]
+        );
+    };
+    
+    // Scale the stroke data from canvas dimensions to targetSize (256x256)
+    // const scaleStrokes = (strokes) => {
+    //     const targetSize = 256;
+    //     return strokes.map(([xCoords, yCoords]) => {
+    //     if (xCoords.length === 0 || yCoords.length === 0) return [[], []];
+    //     // Scale each coordinate relative to the canvas dimensions
+    //     const newX = xCoords.map(x => Math.round((x / canvasWidth) * targetSize));
+    //     const newY = yCoords.map(y => Math.round((y / canvasHeight) * targetSize));
+    //     return [newX, newY];
+    //     });
+    // };
 
     const clearCanvas = () => {
         const canvas = canvasRef.current;
