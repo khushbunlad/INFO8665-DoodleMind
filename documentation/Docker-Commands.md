@@ -11,3 +11,11 @@
 ```docker tag doodlemind-flask-app khushbunladwork/doodlemind-flask-app:latest```
 3. Push file as latest version
 ```docker push khushbunladwork/doodlemind-flask-app:latest```
+
+### Run frontend 
+
+Prerequisite : Run Backend project
+
+1. Open Project directory in terminal
+2. Go to ```cd .\doodlemind-frontend\```
+3. Run frontend project ```npm run dev``` 

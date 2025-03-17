@@ -4,8 +4,14 @@ import { useRef, useState, useEffect } from 'react';
 
 export default function DrawingCanvas() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
+    const [strokes, setStrokes] = useState<number[][][]>([]);
+    const [currentStroke, setCurrentStroke] = useState<{ x: number; y: number }[]>([]);
     const [drawing, setDrawing] = useState(false);
+    const [suggestedPrediction, setSuggestedPrediction] = useState<{
+        prediction: string;
+        confidence: number;
+        top3: { class: string; confidence: number }[];
+    } | null>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -14,7 +20,6 @@ export default function DrawingCanvas() {
         if (!ctx) return;
 
         const resizeCanvas = () => {
-            if (!canvas) return;
             canvas.width = canvas.parentElement?.clientWidth || 0;
             canvas.height = canvas.parentElement?.clientHeight || 0;
         };
@@ -24,9 +29,9 @@ export default function DrawingCanvas() {
         return () => window.removeEventListener('resize', resizeCanvas);
     }, []);
 
-    const startDrawing = () => {
+    const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
         setDrawing(true);
-        setPoints([]);
+        setCurrentStroke([]);
     };
 
     const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -35,18 +40,24 @@ export default function DrawingCanvas() {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
-        
+
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        setPoints((prevPoints) => [...prevPoints, { x, y }]);
-        
+
+        setCurrentStroke((prev) => [...prev, { x, y }]);
+
         ctx.lineTo(x, y);
         ctx.stroke();
     };
 
     const stopDrawing = () => {
         setDrawing(false);
+        if (currentStroke.length > 0) {
+            setStrokes((prev) => [...prev, [currentStroke.map((p) => p.x), currentStroke.map((p) => p.y)]]);
+            fetchSuggestedImage([...strokes, [currentStroke.map((p) => p.x), currentStroke.map((p) => p.y)]]);
+        }
+        setCurrentStroke([]);
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -54,9 +65,47 @@ export default function DrawingCanvas() {
         ctx.beginPath();
     };
 
+    const fetchSuggestedImage = async (updatedStrokes: number[][][]) => {
+        try {
+            const requestBody = { drawing: JSON.stringify(updatedStrokes) };
+
+            const response = await fetch('http://localhost:5004/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch prediction');
+            const data = await response.json();
+
+            console.log('API Response:', data);
+
+            setSuggestedPrediction({
+                prediction: data.prediction,
+                confidence: data.confidence,
+                top3: data.top_3_classes.map((cls, index) => ({
+                    class: cls,
+                    confidence: data.top_3_confidences[index],
+                })),
+            });
+        } catch (error) {
+            console.error('Error fetching prediction:', error);
+        }
+    };
+
+    const clearCanvas = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        setStrokes([]);
+        setSuggestedPrediction(null);
+    };
+
     return (
         <div className="flex h-screen">
-            <div className="w-3/4 bg-gray-200">
+            <div className="w-3/4 bg-gray-200 relative">
                 <canvas 
                     ref={canvasRef} 
                     onMouseDown={startDrawing} 
@@ -64,14 +113,30 @@ export default function DrawingCanvas() {
                     onMouseUp={stopDrawing} 
                     className="w-full h-full"
                 />
+                <button 
+                    onClick={clearCanvas} 
+                    className="absolute top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-lg"
+                >
+                    Clear Canvas
+                </button>
             </div>
-            <div className="w-1/4 p-4 bg-gray-300 overflow-y-auto">
-                <h3 className="text-lg font-bold">Drawn Points:</h3>
-                <ul>
-                    {points.map((point, index) => (
-                        <li key={index}>{`(${point.x.toFixed(2)}, ${point.y.toFixed(2)})`}</li>
-                    ))}
-                </ul>
+            <div className="w-1/4 p-4 bg-gray-600 overflow-y-auto">
+                <h3 className="text-lg font-bold">Predictions:</h3>
+                {suggestedPrediction ? (
+                    <div className="mt-4">
+                        <p className="text-xl font-semibold">{suggestedPrediction.prediction} ({(suggestedPrediction.confidence * 100).toFixed(2)}%)</p>
+                        <h4 className="mt-2 text-md font-bold">Top 3 Predictions:</h4>
+                        <ul className="list-disc pl-4">
+                            {suggestedPrediction.top3.map((item, index) => (
+                                <li key={index}>
+                                    {item.class}: {(item.confidence * 100).toFixed(2)}%
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : (
+                    <p>No predictions yet.</p>
+                )}
             </div>
         </div>
     );
