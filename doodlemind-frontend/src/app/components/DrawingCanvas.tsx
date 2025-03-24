@@ -128,18 +128,6 @@ export default function DrawingCanvas() {
             ]
         );
     };
-    
-    // Scale the stroke data from canvas dimensions to targetSize (256x256)
-    // const scaleStrokes = (strokes) => {
-    //     const targetSize = 256;
-    //     return strokes.map(([xCoords, yCoords]) => {
-    //     if (xCoords.length === 0 || yCoords.length === 0) return [[], []];
-    //     // Scale each coordinate relative to the canvas dimensions
-    //     const newX = xCoords.map(x => Math.round((x / canvasWidth) * targetSize));
-    //     const newY = yCoords.map(y => Math.round((y / canvasHeight) * targetSize));
-    //     return [newX, newY];
-    //     });
-    // };
 
     const clearCanvas = () => {
         const canvas = canvasRef.current;
