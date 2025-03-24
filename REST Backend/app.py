@@ -4,7 +4,6 @@ from flasgger import Swagger, swag_from
 from ml import predict_image
 from flask_cors import CORS
 
-
 app = Flask(__name__)
 CORS(app)
 
