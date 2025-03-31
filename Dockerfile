@@ -1,21 +1,30 @@
-# Use an official Python runtime as a parent image
-FROM python:3.10-slim
+# Use an official Node runtime as a parent image (Debian-based)
+FROM node:18-slim
 
-# Set the working directory in the container
+# Install Python and pip
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy and install backend dependencies
+# Assuming your backend is in the "doodlemind-backend" directory
 WORKDIR /app
+COPY doodlemind-backend/ /app
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy and install frontend dependencies
+# Assuming your frontend is in the "doodlemind-frontend" directory
+WORKDIR /frontend
+COPY doodlemind-frontend/ /frontend
+RUN npm install
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Expose the ports for backend and frontend
+# Flask (backend) runs on port 5004 and Next.js dev server typically on 3000
+EXPOSE 5004 3000
 
-# Expose the port the app runs on
-EXPOSE 5004
+# Copy the entrypoint script into the container
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Define environment variable for Flask
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
-
-# Run the application
-CMD ["python3", "./doodlemind-backend/app.py"]
+# Run the entrypoint script
+CMD ["/entrypoint.sh"]
