@@ -19,3 +19,7 @@
 ### Update Requirements.txt file once installing new packages
 
 ```pip freeze > requirements.txt```
+
+## command to run gitleaks
+
+``` gitleaks detect --source . --config test.gitleaks.toml --verbose ```
