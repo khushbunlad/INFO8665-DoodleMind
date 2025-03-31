@@ -43,6 +43,8 @@ export type Mouse = {
   cursorState: 'move' | 'resize' | 'none';
 };
 
+const baseUrl = process.env.BACKEND_URL || 'http://127.0.0.1:5004';
+
 export default function Home() {
   const { theme } = useTheme();
 
@@ -556,7 +558,7 @@ export default function Home() {
     console.log('Sending API request with payload:', payload);
 
     try {
-      const response = await fetch('http://127.0.0.1:5004/predict', {
+      const response = await fetch(`${baseUrl}/predict`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
