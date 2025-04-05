@@ -3,6 +3,7 @@ from flask_restful import Api
 from flasgger import Swagger, swag_from
 from ml import predict_image
 from flask_cors import CORS
+import os
 
 
 app = Flask(__name__)
@@ -87,4 +88,4 @@ def predict():
     
 if __name__ == "__main__":
     print("\n\n--------------------------------------------------------\nAccess API here: http://localhost:5004/apidocs/\n--------------------------------------------------------\n")
-    app.run(host='0.0.0.0', port=5004)
+    app.run(host=os.getenv('IP', "0.0.0.0"), port=os.getenv('PORT', 5004))
