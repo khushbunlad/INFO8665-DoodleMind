@@ -1,0 +1,3 @@
+- Datasource is used from kaggle and model is trained
+- Further this model is utilized for API's.
+- No need to download and use it from data collection
