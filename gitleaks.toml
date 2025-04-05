@@ -1,0 +1,5 @@
+[[rules]]
+id = "credentials-in-requirements"
+description = "Detect username and password in URLs"
+regex = '''https?://.*?:.*?@.*?'''
+tags = ["username", "password", "repo"]
