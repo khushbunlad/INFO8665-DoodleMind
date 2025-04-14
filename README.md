@@ -22,3 +22,4 @@
 
 ### command to run gitleaks
 gitleaks detect --source . --config .gitleaks.toml
+
