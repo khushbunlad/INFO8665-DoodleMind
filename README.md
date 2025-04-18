@@ -20,5 +20,6 @@
 
 ```pip freeze > requirements.txt```
 
-## command to run gitleaks
-gitleaks detect --source . --config gitleaks.toml
+### command to run gitleaks
+gitleaks detect --source . --config .gitleaks.toml
+
