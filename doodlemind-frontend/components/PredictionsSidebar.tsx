@@ -7,6 +7,7 @@ import Image from 'next/image';
 import stencilDataRaw from '../stencils.json';
 import ImageModel from '@/models/image.model';
 import { Tools } from '@/enums/Tools';
+import { X } from 'lucide-react';
 
 const stencilData = stencilDataRaw as Record<string, { src: string; collection: string }[]>;
 
@@ -18,7 +19,8 @@ interface PredictionsSidebarProps {
     top_3_confidences: number[];
   };
   parentRef: React.RefObject<HTMLDivElement>;
-  replaceStrokesWithImage: () => void;
+  // replaceStrokesWithImage: () => void;
+  replaceStrokesWithImage: () => { x: number; y: number };
   setSelectedTool: React.Dispatch<React.SetStateAction<Tools>>;
 }
 
@@ -56,8 +58,10 @@ export default function PredictionsSidebar({
                             key={index}
                             className="min-w-[100px] cursor-pointer"
                             onClick={() => {
-                              replaceStrokesWithImage();
-                              ImageModel.getImageFromURL(img.src, parentRef);
+                              //replaceStrokesWithImage();
+                              //ImageModel.getImageFromURL(img.src, parentRef);
+                              const { x, y } = replaceStrokesWithImage();
+                              ImageModel.getImageFromURL(img.src, parentRef, x, y);
                               setSelectedTool(Tools.Select);
                             }}
                             aria-label={`Insert doodle from ${img.collection}`}
