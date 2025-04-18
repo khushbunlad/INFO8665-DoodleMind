@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "start-server": "next start -p 3000 -H 10.144.127.52",
+    "start-server": "next start -p 3000 -H 10.144.127.7",
     "prettier": "prettier --write ./**/*.{ts,tsx,js,jsx,json,css,scss,md}"
   },
   "dependencies": {
