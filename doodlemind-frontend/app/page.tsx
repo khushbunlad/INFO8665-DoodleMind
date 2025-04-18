@@ -581,20 +581,46 @@ export default function Home() {
   };
 
   // This function clears all pen strokes and then inserts the image from the URL.
+  // const replaceStrokesWithImage = () => {
+  //   // Check if there are any strokes drawn by the pen tool.
+  //   if (strokes.length > 0 || currentStrokeRef.current.x.length > 0) {
+  //     // Clear the strokes state and current stroke ref.
+  //     setStrokes([]);
+  //     currentStrokeRef.current = { x: [], y: [] };
+
+  //     // Remove all pen-drawn shapes from the global store.
+  //     // Assuming that pen strokes are stored as instances of PenModel,
+  //     // adjust this filter if your implementation is different.
+  //     Store.allShapes = Store.allShapes.filter((shape) => !(shape instanceof PenModel));
+  //   }
+  // };
   const replaceStrokesWithImage = () => {
-    // Check if there are any strokes drawn by the pen tool.
-    if (strokes.length > 0 || currentStrokeRef.current.x.length > 0) {
-      // Clear the strokes state and current stroke ref.
-      setStrokes([]);
-      currentStrokeRef.current = { x: [], y: [] };
-
-      // Remove all pen-drawn shapes from the global store.
-      // Assuming that pen strokes are stored as instances of PenModel,
-      // adjust this filter if your implementation is different.
-      Store.allShapes = Store.allShapes.filter((shape) => !(shape instanceof PenModel));
+    let insertX = 100; // default fallback
+    let insertY = 100;
+  
+    // Combine x and y points from all strokes
+    const allX = [...currentStrokeRef.current.x, ...strokes.flatMap(([x]) => x)];
+    const allY = [...currentStrokeRef.current.y, ...strokes.flatMap(([, y]) => y)];
+  
+    if (allX.length > 0 && allY.length > 0) {
+      // Get the center of all points
+      const minX = Math.min(...allX);
+      const maxX = Math.max(...allX);
+      const minY = Math.min(...allY);
+      const maxY = Math.max(...allY);
+      
+      insertX = (minX + maxX) / 2;
+      insertY = (minY + maxY) / 2;
     }
+  
+    // Now clear strokes
+    setStrokes([]);
+    currentStrokeRef.current = { x: [], y: [] };
+    Store.allShapes = Store.allShapes.filter((shape) => !(shape instanceof PenModel));
+  
+    return { x: insertX, y: insertY };
   };
-
+  
   const onTouchMove = throttle(
     (e: React.TouchEvent<HTMLCanvasElement>) => {
       if (!canvasRef.current) return;

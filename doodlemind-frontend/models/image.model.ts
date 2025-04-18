@@ -241,123 +241,243 @@ class ImageModel {
     };
   }
 
-  static getImageFromURL(url: string, parentRef: React.MutableRefObject<HTMLElement | null>) {
-    // Check if the URL is an SVG (you can enhance this check as needed)
-    if (url.endsWith('.svg')) {
-      fetch(url)
-        .then((res) => res.text())
-        .then((svgText) => {
-          // Replace white fills (for #fff and #ffffff) in style blocks with none.
-          const modifiedSvgText = svgText
-            .replace(/fill\s*:\s*#fff(\b)/gi, 'fill:none$1')
-            .replace(/fill\s*:\s*#ffffff(\b)/gi, 'fill:none$1');
-          // If you want, you can also remove white fills outside of the style tag
-          // by doing a global replace (but be cautious):
-          // .replace(/fill\s*=\s*["']#fff["']/gi, 'fill="none"');
+  // static getImageFromURL(url: string, parentRef: React.MutableRefObject<HTMLElement | null>) {
+  //   // Check if the URL is an SVG (you can enhance this check as needed)
+  //   if (url.endsWith('.svg')) {
+  //     fetch(url)
+  //       .then((res) => res.text())
+  //       .then((svgText) => {
+  //         // Replace white fills (for #fff and #ffffff) in style blocks with none.
+  //         const modifiedSvgText = svgText
+  //           .replace(/fill\s*:\s*#fff(\b)/gi, 'fill:none$1')
+  //           .replace(/fill\s*:\s*#ffffff(\b)/gi, 'fill:none$1');
+  //         // If you want, you can also remove white fills outside of the style tag
+  //         // by doing a global replace (but be cautious):
+  //         // .replace(/fill\s*=\s*["']#fff["']/gi, 'fill="none"');
 
-          // Create a blob from the modified SVG text
-          const blob = new Blob([modifiedSvgText], { type: 'image/svg+xml' });
-          const blobUrl = URL.createObjectURL(blob);
+  //         // Create a blob from the modified SVG text
+  //         const blob = new Blob([modifiedSvgText], { type: 'image/svg+xml' });
+  //         const blobUrl = URL.createObjectURL(blob);
 
-          const imageElement = new Image();
-          imageElement.crossOrigin = 'anonymous';
-          imageElement.src = blobUrl;
-          imageElement.onload = () => {
-            let imageWidth = imageElement.width;
-            let imageHeight = imageElement.height;
-            const parentWidth = parentRef.current?.clientWidth || 500;
-            const parentHeight = parentRef.current?.clientHeight || 500;
+  //         const imageElement = new Image();
+  //         imageElement.crossOrigin = 'anonymous';
+  //         imageElement.src = blobUrl;
+  //         imageElement.onload = () => {
+  //           let imageWidth = imageElement.width;
+  //           let imageHeight = imageElement.height;
+  //           const parentWidth = parentRef.current?.clientWidth || 500;
+  //           const parentHeight = parentRef.current?.clientHeight || 500;
 
-            // Scale the image if it's too large for the parent
-            if (imageWidth > parentWidth || imageHeight > parentHeight) {
-              const aspectRatio = imageWidth / imageHeight;
-              if (imageWidth > imageHeight) {
-                imageWidth = parentWidth / 2;
-                imageHeight = imageWidth / aspectRatio;
-              } else {
-                imageHeight = parentHeight / 2;
-                imageWidth = imageHeight * aspectRatio;
+  //           // Scale the image if it's too large for the parent
+  //           if (imageWidth > parentWidth || imageHeight > parentHeight) {
+  //             const aspectRatio = imageWidth / imageHeight;
+  //             if (imageWidth > imageHeight) {
+  //               imageWidth = parentWidth / 2;
+  //               imageHeight = imageWidth / aspectRatio;
+  //             } else {
+  //               imageHeight = parentHeight / 2;
+  //               imageWidth = imageHeight * aspectRatio;
+  //             }
+  //           }
+
+  //           const image = new ImageModel(
+  //             (parentWidth - imageWidth) / 2, // x1: center horizontally
+  //             (parentHeight - imageHeight) / 2, // y1: center vertically
+  //             imageWidth, // width (x2)
+  //             imageHeight, // height (y2)
+  //             imageElement
+  //           );
+  //           image.setIsSelected(true);
+  //           image.originalSVGText = modifiedSvgText; // Save the original SVG text for later updates
+
+  //           // Add the image to the store
+  //           Store.allShapes.push(image);
+  //           UndoRedoService.push({
+  //             type: UndoRedoEventType.CREATE,
+  //             index: Store.allShapes.length - 1,
+  //             shape: {
+  //               from: null,
+  //               to: image,
+  //             },
+  //           });
+  //           console.log('Image inserted into store:', image);
+  //         };
+
+  //         imageElement.onerror = () => {
+  //           console.error('Failed to load modified SVG from URL:', url);
+  //         };
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching SVG:', error);
+  //       });
+  //   } else {
+  //     // Fallback for non-SVG images (using your existing logic)
+  //     const imageElement = new Image();
+  //     imageElement.crossOrigin = 'anonymous';
+  //     imageElement.src = url;
+  //     imageElement.onload = () => {
+  //       let imageWidth = imageElement.width;
+  //       let imageHeight = imageElement.height;
+  //       const parentWidth = parentRef.current?.clientWidth || 500;
+  //       const parentHeight = parentRef.current?.clientHeight || 500;
+
+  //       if (imageWidth > parentWidth || imageHeight > parentHeight) {
+  //         const aspectRatio = imageWidth / imageHeight;
+  //         if (imageWidth > imageHeight) {
+  //           imageWidth = parentWidth / 2;
+  //           imageHeight = imageWidth / aspectRatio;
+  //         } else {
+  //           imageHeight = parentHeight / 2;
+  //           imageWidth = imageHeight * aspectRatio;
+  //         }
+  //       }
+
+  //       const image = new ImageModel(
+  //         (parentWidth - imageWidth) / 2,
+  //         (parentHeight - imageHeight) / 2,
+  //         imageWidth,
+  //         imageHeight,
+  //         imageElement
+  //       );
+  //       image.setIsSelected(true);
+
+  //       Store.allShapes.push(image);
+  //       UndoRedoService.push({
+  //         type: UndoRedoEventType.CREATE,
+  //         index: Store.allShapes.length - 1,
+  //         shape: {
+  //           from: null,
+  //           to: image,
+  //         },
+  //       });
+  //       console.log('Image inserted into store:', image);
+  //     };
+
+  //     imageElement.onerror = () => {
+  //       console.error('Failed to load image from URL:', url);
+  //     };
+  //   }
+  // }
+
+  static getImageFromURL(url: string, parentRef: React.MutableRefObject<HTMLElement | null>, insertX: number,
+    insertY: number) {
+      // Check if the URL is an SVG (you can enhance this check as needed)
+      if (url.endsWith('.svg')) {
+        fetch(url)
+          .then((res) => res.text())
+          .then((svgText) => {
+            // Replace white fills (for #fff and #ffffff) in style blocks with none.
+            const modifiedSvgText = svgText
+              .replace(/fill\s*:\s*#fff(\b)/gi, 'fill:none$1')
+              .replace(/fill\s*:\s*#ffffff(\b)/gi, 'fill:none$1');
+            // If you want, you can also remove white fills outside of the style tag
+            // by doing a global replace (but be cautious):
+            // .replace(/fill\s*=\s*["']#fff["']/gi, 'fill="none"');
+  
+            // Create a blob from the modified SVG text
+            const blob = new Blob([modifiedSvgText], { type: 'image/svg+xml' });
+            const blobUrl = URL.createObjectURL(blob);
+  
+            const imageElement = new Image();
+            imageElement.crossOrigin = 'anonymous';
+            imageElement.src = blobUrl;
+            imageElement.onload = () => {
+              let imageWidth = imageElement.width;
+              let imageHeight = imageElement.height;
+              const parentWidth = parentRef.current?.clientWidth || 500;
+              const parentHeight = parentRef.current?.clientHeight || 500;
+  
+              // Scale the image if it's too large for the parent
+              if (imageWidth > parentWidth || imageHeight > parentHeight) {
+                const aspectRatio = imageWidth / imageHeight;
+                if (imageWidth > imageHeight) {
+                  imageWidth = parentWidth / 2;
+                  imageHeight = imageWidth / aspectRatio;
+                } else {
+                  imageHeight = parentHeight / 2;
+                  imageWidth = imageHeight * aspectRatio;
+                }
               }
+  
+              const image = new ImageModel(
+                insertX - imageWidth / 2,
+          insertY - imageHeight / 2,
+  
+                imageWidth, // width (x2)
+                imageHeight, // height (y2)
+                imageElement
+              );
+              image.setIsSelected(true);
+              image.originalSVGText = modifiedSvgText; // Save the original SVG text for later updates
+  
+              // Add the image to the store
+              Store.allShapes.push(image);
+              UndoRedoService.push({
+                type: UndoRedoEventType.CREATE,
+                index: Store.allShapes.length - 1,
+                shape: {
+                  from: null,
+                  to: image,
+                },
+              });
+              console.log('Image inserted into store:', image);
+            };
+  
+            imageElement.onerror = () => {
+              console.error('Failed to load modified SVG from URL:', url);
+            };
+          })
+          .catch((error) => {
+            console.error('Error fetching SVG:', error);
+          });
+      } else {
+        // Fallback for non-SVG images (using your existing logic)
+        const imageElement = new Image();
+        imageElement.crossOrigin = 'anonymous';
+        imageElement.src = url;
+        imageElement.onload = () => {
+          let imageWidth = imageElement.width;
+          let imageHeight = imageElement.height;
+          const parentWidth = parentRef.current?.clientWidth || 500;
+          const parentHeight = parentRef.current?.clientHeight || 500;
+  
+          if (imageWidth > parentWidth || imageHeight > parentHeight) {
+            const aspectRatio = imageWidth / imageHeight;
+            if (imageWidth > imageHeight) {
+              imageWidth = parentWidth / 2;
+              imageHeight = imageWidth / aspectRatio;
+            } else {
+              imageHeight = parentHeight / 2;
+              imageWidth = imageHeight * aspectRatio;
             }
-
-            const image = new ImageModel(
-              (parentWidth - imageWidth) / 2, // x1: center horizontally
-              (parentHeight - imageHeight) / 2, // y1: center vertically
-              imageWidth, // width (x2)
-              imageHeight, // height (y2)
-              imageElement
-            );
-            image.setIsSelected(true);
-            image.originalSVGText = modifiedSvgText; // Save the original SVG text for later updates
-
-            // Add the image to the store
-            Store.allShapes.push(image);
-            UndoRedoService.push({
-              type: UndoRedoEventType.CREATE,
-              index: Store.allShapes.length - 1,
-              shape: {
-                from: null,
-                to: image,
-              },
-            });
-            console.log('Image inserted into store:', image);
-          };
-
-          imageElement.onerror = () => {
-            console.error('Failed to load modified SVG from URL:', url);
-          };
-        })
-        .catch((error) => {
-          console.error('Error fetching SVG:', error);
-        });
-    } else {
-      // Fallback for non-SVG images (using your existing logic)
-      const imageElement = new Image();
-      imageElement.crossOrigin = 'anonymous';
-      imageElement.src = url;
-      imageElement.onload = () => {
-        let imageWidth = imageElement.width;
-        let imageHeight = imageElement.height;
-        const parentWidth = parentRef.current?.clientWidth || 500;
-        const parentHeight = parentRef.current?.clientHeight || 500;
-
-        if (imageWidth > parentWidth || imageHeight > parentHeight) {
-          const aspectRatio = imageWidth / imageHeight;
-          if (imageWidth > imageHeight) {
-            imageWidth = parentWidth / 2;
-            imageHeight = imageWidth / aspectRatio;
-          } else {
-            imageHeight = parentHeight / 2;
-            imageWidth = imageHeight * aspectRatio;
           }
-        }
-
-        const image = new ImageModel(
-          (parentWidth - imageWidth) / 2,
-          (parentHeight - imageHeight) / 2,
-          imageWidth,
-          imageHeight,
-          imageElement
-        );
-        image.setIsSelected(true);
-
-        Store.allShapes.push(image);
-        UndoRedoService.push({
-          type: UndoRedoEventType.CREATE,
-          index: Store.allShapes.length - 1,
-          shape: {
-            from: null,
-            to: image,
-          },
-        });
-        console.log('Image inserted into store:', image);
-      };
-
-      imageElement.onerror = () => {
-        console.error('Failed to load image from URL:', url);
-      };
+  
+          const image = new ImageModel(
+            insertX - imageWidth / 2,
+        insertY - imageHeight / 2,
+            imageWidth,
+            imageHeight,
+            imageElement
+          );
+          image.setIsSelected(true);
+  
+          Store.allShapes.push(image);
+          UndoRedoService.push({
+            type: UndoRedoEventType.CREATE,
+            index: Store.allShapes.length - 1,
+            shape: {
+              from: null,
+              to: image,
+            },
+          });
+          console.log('Image inserted into store:', image);
+        };
+  
+        imageElement.onerror = () => {
+          console.error('Failed to load image from URL:', url);
+        };
+      }
     }
-  }
 }
 
 export default ImageModel;
