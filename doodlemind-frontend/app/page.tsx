@@ -31,6 +31,7 @@ import { Theme } from '@/enums/Theme';
 import ActionsService from '@/services/actions.service';
 import GithubCard from '@/components/GithubCard';
 import PredictionsSidebar from '@/components/PredictionsSidebar';
+import { playSmartNarration } from '@/utils/playSmartNarration';
 
 export type Mouse = {
   x: number;
@@ -157,6 +158,16 @@ export default function Home() {
     }
   }, []);
 
+  // Warming up the endpoint
+  useEffect(() => {
+    fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'warming up' }),
+    }).catch(() => {});
+  }, []);
+
+  
   const draw = useCallback(
     (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, drawFn: () => void) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -499,7 +510,6 @@ export default function Home() {
       // Update state with unprocessed strokes
       setStrokes(updatedStrokes);
 
-      // Call the prediction API AFTER state update
       handlePredict(processedData);
 
       setCurrentStroke({ ...currentStrokeRef.current });
@@ -572,8 +582,11 @@ export default function Home() {
       }
 
       const data = await response.json();
-
       console.log('Prediction Response:', data); // Log the response
+
+      // After prediction
+      playSmartNarration(data.prediction, data.confidence);
+
       setPredictionResult(data); // Store the result in state if needed
     } catch (error) {
       console.error('Error during prediction:', error);
@@ -597,30 +610,30 @@ export default function Home() {
   const replaceStrokesWithImage = () => {
     let insertX = 100; // default fallback
     let insertY = 100;
-  
+
     // Combine x and y points from all strokes
     const allX = [...currentStrokeRef.current.x, ...strokes.flatMap(([x]) => x)];
     const allY = [...currentStrokeRef.current.y, ...strokes.flatMap(([, y]) => y)];
-  
+
     if (allX.length > 0 && allY.length > 0) {
       // Get the center of all points
       const minX = Math.min(...allX);
       const maxX = Math.max(...allX);
       const minY = Math.min(...allY);
       const maxY = Math.max(...allY);
-      
+
       insertX = (minX + maxX) / 2;
       insertY = (minY + maxY) / 2;
     }
-  
+
     // Now clear strokes
     setStrokes([]);
     currentStrokeRef.current = { x: [], y: [] };
     Store.allShapes = Store.allShapes.filter((shape) => !(shape instanceof PenModel));
-  
+
     return { x: insertX, y: insertY };
   };
-  
+
   const onTouchMove = throttle(
     (e: React.TouchEvent<HTMLCanvasElement>) => {
       if (!canvasRef.current) return;
