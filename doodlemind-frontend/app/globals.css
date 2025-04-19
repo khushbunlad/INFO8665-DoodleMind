@@ -38,3 +38,29 @@ body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+@keyframes bubblePopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(5px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bubble {
+  animation: bubblePopIn 0.5s ease-out, fadeOut 3s 2.5s forwards;
+}
