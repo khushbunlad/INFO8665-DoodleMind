@@ -32,6 +32,7 @@ import ActionsService from '@/services/actions.service';
 import GithubCard from '@/components/GithubCard';
 import PredictionsSidebar from '@/components/PredictionsSidebar';
 import { playSmartNarration } from '@/utils/playSmartNarration';
+import SpeechBubble from '@/components/SpeechBubble';
 
 export type Mouse = {
   x: number;
@@ -70,6 +71,7 @@ export default function Home() {
   const [undoneStrokes, setUndoneStrokes] = useState<Array<[number[], number[]]>>([]);
   const currentStrokeRef = useRef<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const [predictionResult, setPredictionResult] = useState<any>(null);
+  const [narrationText, setNarrationText] = useState('');
 
   const [selectedTool, setSelectedTool] = useState<Tools>(Tools.Pen);
   const [selectedShapeType, setSelectedShapeType] = useState<
@@ -167,7 +169,6 @@ export default function Home() {
     }).catch(() => {});
   }, []);
 
-  
   const draw = useCallback(
     (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, drawFn: () => void) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -585,7 +586,7 @@ export default function Home() {
       console.log('Prediction Response:', data); // Log the response
 
       // After prediction
-      playSmartNarration(data.prediction, data.confidence);
+      playSmartNarration(data.prediction, data.confidence, setNarrationText);
 
       setPredictionResult(data); // Store the result in state if needed
     } catch (error) {
@@ -781,6 +782,8 @@ export default function Home() {
         }}
         onTouchEnd={onTouchEnd}
       />
+
+      <SpeechBubble message={narrationText} />
     </div>
   );
 }
