@@ -33,6 +33,8 @@ import GithubCard from '@/components/GithubCard';
 import PredictionsSidebar from '@/components/PredictionsSidebar';
 import { playSmartNarration } from '@/utils/playSmartNarration';
 import SpeechBubble from '@/components/SpeechBubble';
+import ModeSwitch from '@/components/adult-child-switch/ModeSwitch';
+
 
 export type Mouse = {
   x: number;
@@ -758,7 +760,9 @@ export default function Home() {
       <IconCard />
       {/* <GithubCard /> */}
       <ExportCard getCanvasData={getCanvasData} />
+      {/* Add ModeToggle before DarkSwitch */}
       <DarkSwitch />
+      <ModeSwitch />
       <PredictionsSidebar
         prediction={predictionResult}
         parentRef={parentRef}
