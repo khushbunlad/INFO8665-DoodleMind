@@ -492,7 +492,12 @@ export default function Home() {
 
     mouseRef.current.down = false;
     mouseRef.current.cursorState = 'none';
-
+    // Clear stroke data (for pen or eraser cleanup)
+   
+  if (selectedTool === Tools.Eraser) {
+    // Clear pen stroke data (if you want to reset it after erasing)
+    currentStrokeRef.current = { x: [], y: [] };
+  }
     scaleAndPredict();
   };
 

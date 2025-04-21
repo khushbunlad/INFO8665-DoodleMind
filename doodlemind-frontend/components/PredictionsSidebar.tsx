@@ -69,8 +69,8 @@ export default function PredictionsSidebar({
                             <Image
                               src={img.src}
                               alt={`${cls} - ${img.collection}`}
-                              width={100}
-                              height={100}
+                              width={90}
+                              height={90}
                               className="border border-gray-400 rounded-md hover:shadow-lg "
                             />
                           </div>
