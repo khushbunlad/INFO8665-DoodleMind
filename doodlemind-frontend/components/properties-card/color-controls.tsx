@@ -29,23 +29,22 @@ export default function ColorControls({
   const shade = selectedColor.split(',')[3].replace(')', '');
   const baseColor = selectedColor.substring(0, selectedColor.lastIndexOf(','));
 
-  const updateInsertedImageColor = (newColor: string) => {
-    // Look for the currently selected image in Store.allShapes.
-    // If no image is selected, fall back to the last inserted image.
+  const updateInsertedImageColor = (newColor: string, type: string) => {
     let insertedImage = Store.allShapes.find(
       (shape) => shape instanceof ImageModel && shape.isSelected
     ) as ImageModel | undefined;
 
     if (!insertedImage) {
-      // If no image is selected, update the last image in the store (if any)
       const imageShapes = Store.allShapes.filter(
         (shape) => shape instanceof ImageModel
       ) as ImageModel[];
       insertedImage = imageShapes[imageShapes.length - 1];
     }
 
-    if (insertedImage) {
+    if (insertedImage && type === 'stroke') {
       insertedImage.updateStrokeColor(newColor);
+    } else if (insertedImage && type === 'fill') {
+      insertedImage.updateFillColor(newColor);
     }
   };
 
@@ -89,14 +88,13 @@ export default function ColorControls({
     type === 'stroke' || type === 'text' ? baseStrokeColorIndex : baseFillColorIndex - 1;
 
   const handleColorChange = (color: string) => {
-    
     if (type === 'stroke' || type === 'text') {
       const opacity = (selectedStrokeShade + 1) * 0.25;
       setSelectedColor(color.replace(/[^,]+(?=\))/, opacity.toString()), true);
-      
+
       const index = allStrokeColors.findIndex((c) => c === color);
       setBaseStrokeColorIndex(index);
-      updateInsertedImageColor(color);
+      updateInsertedImageColor(color, 'stroke');
     } else {
       //in case of transparent color, just set the color, as there is no shade
       if (color === FillColor.Transparent) {
@@ -108,6 +106,7 @@ export default function ColorControls({
 
       const index = allFillColors.findIndex((c) => c === color);
       setBaseFillColorIndex(index);
+      updateInsertedImageColor(color, 'fill');
     }
   };
 

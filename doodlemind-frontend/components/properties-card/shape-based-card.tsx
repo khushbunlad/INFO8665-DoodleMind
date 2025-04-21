@@ -313,15 +313,17 @@ export default function ShapeBasedCard({
             }}
           />
         ) : (
-          <ColorControls
-            header={'Stroke Color'}
-            type={'stroke'}
-            selectedColor={selectedStrokeColor}
-            setSelectedColor={(color, undoRedoCount) => {
-              setSelectedStrokeColor(color);
-              setSelectedShapeStrokeColor(color as StrokeColor, undoRedoCount);
-            }}
-          />
+          <>
+            <ColorControls
+              header={'Stroke Color'}
+              type={'stroke'}
+              selectedColor={selectedStrokeColor}
+              setSelectedColor={(color, undoRedoCount) => {
+                setSelectedStrokeColor(color);
+                setSelectedShapeStrokeColor(color as StrokeColor, undoRedoCount);
+              }}
+            />
+          </>
         )}
         {(selectedShapeType === Tools.Polygon || selectedShapeType === Tools.Ellipse) && (
           <>
@@ -350,7 +352,18 @@ export default function ShapeBasedCard({
             }}
           />
         )}
-        {selectedShapeType === Tools.Text ? (
+        {selectedShapeType === Tools.Image && (
+          <ColorControls
+            header={'Fill Color'}
+            type={'fill'}
+            selectedColor={selectedFillColor}
+            setSelectedColor={(color, undoRedoCount) => {
+              setSelectedFillColor(color);
+              setSelectedShapeFillColor(color as FillColor, undoRedoCount);
+            }}
+          />
+        )}
+        {selectedShapeType === Tools.Text && (
           <SizeControls
             header={'Font Size'}
             max={100}
@@ -363,6 +376,9 @@ export default function ShapeBasedCard({
               setSelectedTextFontSize(size);
             }}
           />
+        )}
+        {selectedShapeType === Tools.Image ? (
+          <> </>
         ) : (
           <SizeControls
             header={'Stroke Width'}
@@ -386,7 +402,7 @@ export default function ShapeBasedCard({
             }}
           />
         )}
-        {selectedShapeType !== Tools.Text && (
+        {selectedShapeType !== Tools.Text && selectedShapeType !== Tools.Image && (
           <StrokeVariantControls
             selectedStrokeVariant={selectedStrokeVariant}
             setSelectedStrokeVariant={(variant) => {
