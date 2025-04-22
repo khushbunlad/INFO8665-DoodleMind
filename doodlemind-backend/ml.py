@@ -64,8 +64,6 @@ def drawing_to_image_array(drawing, size, lw=6, time_color=True):
 
 
 def predict_image(drawing_data):
-    logger.info("Received drawing data for prediction")
-    logger.info(f"Drawing data: {drawing_data}")
     image = drawing_to_image_array(drawing_data, size)
     preds = model.predict(image)
     

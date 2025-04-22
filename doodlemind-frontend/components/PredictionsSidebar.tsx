@@ -30,7 +30,7 @@ export default function PredictionsSidebar({
   parentRef,
   replaceStrokesWithImage,
 }: PredictionsSidebarProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   const predictedDoodle =
     stencilData[prediction?.prediction]?.[0]?.src || '/default-placeholder.svg';
