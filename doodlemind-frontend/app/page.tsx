@@ -60,6 +60,16 @@ export default function Home() {
     resizeState: SelectionResize.None,
     cursorState: 'none',
   });
+  const touchRef = useRef({
+    x: 0,
+    y: 0,
+    prevX: 0,
+    prevY: 0,
+    down: false,
+    cursor: Cursors.DEFAULT,
+    resizeState: SelectionResize.None,
+    cursorState: 'none',
+  });
 
   const [currentStroke, setCurrentStroke] = useState<{ x: number[]; y: number[] }>({
     x: [],
@@ -580,20 +590,6 @@ export default function Home() {
     }
   };
 
-  // This function clears all pen strokes and then inserts the image from the URL.
-  // const replaceStrokesWithImage = () => {
-  //   // Check if there are any strokes drawn by the pen tool.
-  //   if (strokes.length > 0 || currentStrokeRef.current.x.length > 0) {
-  //     // Clear the strokes state and current stroke ref.
-  //     setStrokes([]);
-  //     currentStrokeRef.current = { x: [], y: [] };
-
-  //     // Remove all pen-drawn shapes from the global store.
-  //     // Assuming that pen strokes are stored as instances of PenModel,
-  //     // adjust this filter if your implementation is different.
-  //     Store.allShapes = Store.allShapes.filter((shape) => !(shape instanceof PenModel));
-  //   }
-  // };
   const replaceStrokesWithImage = () => {
     let insertX = 100; // default fallback
     let insertY = 100;
@@ -638,7 +634,7 @@ export default function Home() {
         cursorState: mouseRef.current.cursorState,
       };
 
-      if (mouseRef.current.down && selectedTool == Tools.Pen) {
+      if (mouseRef.current.down && selectedTool === Tools.Pen) {
         // Accumulate stroke coordinates in the ref without causing a re-render
         currentStrokeRef.current.x.push(mouseRef.current.x);
         currentStrokeRef.current.y.push(mouseRef.current.y);
@@ -647,10 +643,21 @@ export default function Home() {
     selectedTool === Tools.Eraser ? 0 : 5
   );
 
-  const onTouchStart = () => {
+  const onTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
     mouseRef.current.down = true;
+    
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    console.log(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+   
+    // var mouseEvent = new MouseEvent("mousedown", {
+    //   clientX: e.touches[0].clientX,
+    //   clientY: e.touches[0].clientY
+    // });
+    // canvasRef.current.dispatchEvent(mouseEvent);
 
-    if (selectedTool == Tools.Pen) currentStrokeRef.current = { x: [], y: [] };
+  if (selectedTool === Tools.Pen)
+    currentStrokeRef.current = { x: [], y: [] };
   };
 
   const onTouchEnd = () => {
@@ -661,6 +668,7 @@ export default function Home() {
 
     scaleAndPredict();
   };
+  
 
   // THIS IS TO PREVENT SCROLLING ON TOUCH DEVICES (SWIPE DOWN TO REFRESH)
   useEffect(() => {
@@ -763,9 +771,7 @@ export default function Home() {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onTouchMove={onTouchMove}
-        onTouchStart={() => {
-          onTouchStart();
-        }}
+        onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       />
     </div>

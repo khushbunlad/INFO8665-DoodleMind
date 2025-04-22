@@ -30,7 +30,7 @@ export default function PredictionsSidebar({
   parentRef,
   replaceStrokesWithImage,
 }: PredictionsSidebarProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   const predictedDoodle =
     stencilData[prediction?.prediction]?.[0]?.src || '/default-placeholder.svg';
@@ -38,7 +38,7 @@ export default function PredictionsSidebar({
   return (
     <div className="absolute bottom-0 right-0 flex flex-col items-end p-4">
       {isVisible && (
-        <Card className="h-auto w-80 p-4 shadow-lg bg-[#ffffff] dark:bg-[#18181b] border-gray-300 mb-4">
+        <Card className="h-auto w-90 h-[600px] p-4 shadow-lg bg-[#ffffff] dark:bg-[#18181b] border-gray-300 mb-4">
           <CardBody>
             {/* Replace the single predicted doodle section with this block */}
             <div className="mb-4">
