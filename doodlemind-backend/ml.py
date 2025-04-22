@@ -4,6 +4,21 @@ import numpy as np
 import os
 from tensorflow.keras.models import load_model # type: ignore
 from tensorflow.keras.applications.mobilenet import preprocess_input # type: ignore
+import time
+import logging
+
+# Basic config
+logging.basicConfig(
+    level=logging.INFO,  # Or DEBUG
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("app.log"),  # Logs to a file
+        logging.StreamHandler()          # Logs to console
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
 
 size = 64
 BASE_SIZE = 256
@@ -28,10 +43,15 @@ def draw_cv2(raw_strokes, size=256, lw=6, time_color=True):
 
 def drawing_to_image_array(drawing, size, lw=6, time_color=True):
     raw_strokes = json.loads(drawing)
+    logger.debug(f"Loaded {len(raw_strokes)} strokes.")
     # Create the image from stroke data
     img = draw_cv2(raw_strokes, size=size, lw=lw, time_color=time_color)
+    # Save the image with a unique filename based on timestamp
+    # timestamp = int(time.time())
+    # filename = f"drawing_{timestamp}.jpg"  # Unique filename
+    # cv2.imwrite(filename, img)
     
-    # Save the image as a JPEG file
+     # Save the image as a JPEG file
     cv2.imwrite("drawing.jpg", img)
     
     # Prepare image for model prediction
@@ -44,6 +64,8 @@ def drawing_to_image_array(drawing, size, lw=6, time_color=True):
 
 
 def predict_image(drawing_data):
+    logger.info("Received drawing data for prediction")
+    logger.info(f"Drawing data: {drawing_data}")
     image = drawing_to_image_array(drawing_data, size)
     preds = model.predict(image)
     

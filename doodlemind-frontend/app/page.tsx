@@ -33,6 +33,8 @@ import GithubCard from '@/components/GithubCard';
 import PredictionsSidebar from '@/components/PredictionsSidebar';
 import { playSmartNarration } from '@/utils/playSmartNarration';
 import SpeechBubble from '@/components/SpeechBubble';
+import ModeSwitch from '@/components/adult-child-switch/ModeSwitch';
+
 
 export type Mouse = {
   x: number;
@@ -490,7 +492,12 @@ export default function Home() {
 
     mouseRef.current.down = false;
     mouseRef.current.cursorState = 'none';
-
+    // Clear stroke data (for pen or eraser cleanup)
+   
+  if (selectedTool === Tools.Eraser) {
+    // Clear pen stroke data (if you want to reset it after erasing)
+    currentStrokeRef.current = { x: [], y: [] };
+  }
     scaleAndPredict();
   };
 
@@ -758,7 +765,9 @@ export default function Home() {
       <IconCard />
       {/* <GithubCard /> */}
       <ExportCard getCanvasData={getCanvasData} />
+      {/* Add ModeToggle before DarkSwitch */}
       <DarkSwitch />
+      <ModeSwitch />
       <PredictionsSidebar
         prediction={predictionResult}
         parentRef={parentRef}

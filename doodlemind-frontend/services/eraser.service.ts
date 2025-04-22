@@ -81,51 +81,52 @@ class EraserService {
   }
 
   private static erase(mouseRef: React.MutableRefObject<Mouse>, ctx: CanvasRenderingContext2D) {
-    const allShapes = Store.allShapes;
-
-    for (let i = allShapes.length - 1; i >= 0; i--) {
-      const shape = allShapes[i];
-
+    //const allShapes = Store.allShapes;
+    console.log('initial store.allShapes', Store.allShapes);
+    for (let i = Store.allShapes.length - 1; i >= 0; i--) {
+      const shape = Store.allShapes[i];
       switch (shape.constructor) {
         case PenModel:
           if (PenModel.isPenHovered(shape as PenModel, mouseRef)) {
-            allShapes.splice(i, 1);
+            console.log("Entering Pen Model");
+            Store.allShapes.splice(i, 1);
+            console.log("Shapes after deleting", Store.allShapes);
             this.pushToUndoRedoService(i, shape);
           }
           break;
         case LineModel:
           if (LineModel.isLineHovered(shape as LineModel, mouseRef)) {
-            allShapes.splice(i, 1);
+            Store.allShapes.splice(i, 1);
             this.pushToUndoRedoService(i, shape);
           }
           break;
         case EllipseModel:
           if (EllipseModel.isEllipseHovered(shape as EllipseModel, mouseRef)) {
-            allShapes.splice(i, 1);
+            Store.allShapes.splice(i, 1);
             this.pushToUndoRedoService(i, shape);
           }
           break;
         case ArrowModel:
           if (ArrowModel.isArrowHovered(shape as ArrowModel, mouseRef)) {
-            allShapes.splice(i, 1);
+            Store.allShapes.splice(i, 1);
             this.pushToUndoRedoService(i, shape);
           }
           break;
         case PolygonModel:
           if (PolygonModel.isPolygonHovered(shape as PolygonModel, mouseRef)) {
-            allShapes.splice(i, 1);
+            Store.allShapes.splice(i, 1);
             this.pushToUndoRedoService(i, shape);
           }
           break;
         case TextModel:
           if (TextModel.isTextHovered(shape as TextModel, mouseRef, ctx)) {
-            allShapes.splice(i, 1);
+            Store.allShapes.splice(i, 1);
             this.pushToUndoRedoService(i, shape);
           }
           break;
         case ImageModel:
           if (ImageModel.isImageHovered(shape as ImageModel, mouseRef)) {
-            allShapes.splice(i, 1);
+            Store.allShapes.splice(i, 1);
             this.pushToUndoRedoService(i, shape);
           }
           break;
